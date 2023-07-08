@@ -1,0 +1,25 @@
+###
+GET http://localhost:8080/categories?userId=1
+
+###
+POST http://localhost:8080/categories
+Content-Type: application/json
+
+{
+  "name": "Имя категории",
+  "user": {"id":1}
+}
+
+
+###
+PUT http://localhost:8080/categories
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "Новое имя категории",
+  "user": {"id":1}
+}
+
+###
+DELETE http://localhost:8080/categories/3

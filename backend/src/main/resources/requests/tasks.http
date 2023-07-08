@@ -1,0 +1,65 @@
+###
+GET http://localhost:8080/tasks/statuses
+
+###
+GET http://localhost:8080/tasks/repetitions
+
+###
+GET http://localhost:8080/tasks/priorities
+
+###
+GET http://localhost:8080/tasks?userId=1
+
+###
+GET http://localhost:8080/tasks/categories?categoryId=2
+
+###
+GET http://localhost:8080/tasks/notifications?userId=1
+
+###
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "title": "Позвонить Серёге",
+  "description": "включить телефон, открыть контакты и нажать звонок",
+  "taskDate": "2023-07-08 21:32:10",
+  "status": {
+        "id": 1 
+    },
+    "category": {
+        "id": 2
+    },
+    "repetition": {
+        "id": 1 
+    },
+    "priority": {
+        "id": 1 
+    }
+}
+
+###
+PUT http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "Позвонить Игорю",
+  "description": "включить телефон, открыть контакты и нажать звонок",
+  "taskDate": "2023-07-08 20:35:10",
+  "status": {
+        "id": 1 
+    },
+    "category": {
+        "id": 2
+    },
+    "repetition": {
+        "id": 1 
+    },
+    "priority": {
+        "id": 1 
+    }
+}
+
+###
+DELETE http://localhost:8080/tasks/9
