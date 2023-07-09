@@ -31,6 +31,8 @@ public class TaskDTO {
 
     private ERepetition repetition;
 
+    private CategoryDTO categoryDTO;
+
     public TaskDTO(Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
@@ -39,5 +41,6 @@ public class TaskDTO {
         this.priority = task.getPriority().getName();
         this.status = task.getStatus().getName();
         this.repetition = task.getRepetition().getName();
+        this.categoryDTO = new CategoryDTO(task.getCategory());
     }
 }

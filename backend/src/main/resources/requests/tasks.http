@@ -12,10 +12,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4O
 
 ###
 GET http://localhost:8080/tasks
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbW9uZ3VzIiwiaWF0IjoxNjg4ODk5MDU4LCJleHAiOjE2ODg5ODU0NTh9.F1do8kXivZ8URgxNOuic9zJKRixsGcxbyPAchGXGZf4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4OTE1Nzk2LCJleHAiOjE2ODkwMDIxOTZ9.-6Y2lbjfZHb3BemBopE_9OLPloljcyV1H8E_JbVnTr0
 
 ###
-GET http://localhost:8080/tasks/categories?categoryId=9
+GET http://localhost:8080/tasks/categories?categoryId=9 
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
 
 ###
