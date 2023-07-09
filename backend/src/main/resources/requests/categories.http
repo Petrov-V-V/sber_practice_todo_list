@@ -1,25 +1,27 @@
 ###
-GET http://localhost:8080/categories?userId=1
+GET http://localhost:8080/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbW9uZ3VzIiwiaWF0IjoxNjg4ODk5MDU4LCJleHAiOjE2ODg5ODU0NTh9.F1do8kXivZ8URgxNOuic9zJKRixsGcxbyPAchGXGZf4
 
 ###
 POST http://localhost:8080/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbW9uZ3VzIiwiaWF0IjoxNjg4ODk5MDU4LCJleHAiOjE2ODg5ODU0NTh9.F1do8kXivZ8URgxNOuic9zJKRixsGcxbyPAchGXGZf4
 Content-Type: application/json
 
 {
-  "name": "Имя категории",
-  "user": {"id":1}
+  "name": "Имя старой категории"
 }
 
 
 ###
 PUT http://localhost:8080/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
 Content-Type: application/json
 
 {
-  "id": 2,
-  "name": "Новое имя категории",
-  "user": {"id":1}
+  "id": 8,
+  "name": "Новое имя старой категории"
 }
 
 ###
 DELETE http://localhost:8080/categories/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY

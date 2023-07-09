@@ -1,7 +1,7 @@
 package ru.sber.project_todo_list.entities;
 
 /**
- * Enumerate отвечающий за хранение возможных приоритетов
+ * Перечисление приоритетов задачи
  */
 public enum EPriority {
     CRITICAL,

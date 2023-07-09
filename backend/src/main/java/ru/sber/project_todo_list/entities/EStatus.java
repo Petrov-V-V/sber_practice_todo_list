@@ -1,7 +1,7 @@
 package ru.sber.project_todo_list.entities;
 
 /**
- * Enumerate отвечающий за хранение возможных статусов задания
+ * Перечисление статусов задачи
  */
 public enum EStatus {
     IN_PROGRESS,

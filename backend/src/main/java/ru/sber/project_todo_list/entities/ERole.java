@@ -1,9 +1,8 @@
 package ru.sber.project_todo_list.entities;
 
 /**
- * Enumerate отвечающий за хранение возможных ролей
+ * Перечисление ролей
  */
 public enum ERole {
-    ROLE_USER,
-    ROLE_ADMIN
+    ROLE_USER
 }

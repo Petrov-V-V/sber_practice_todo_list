@@ -16,4 +16,10 @@ public class CategoryDTO {
     private String name;
 
     private long userid;
+
+    public CategoryDTO(Category category) {
+        this.id = category.getId();
+        this.name = category.getName();
+        this.userid = category.getUser().getId();
+    }
 }

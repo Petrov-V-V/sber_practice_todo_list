@@ -23,10 +23,7 @@ public class PriorityService implements PriorityServiceInterface {
     public PriorityService(PriorityRepository priorityRepository) {
         this.priorityRepository = priorityRepository;
     }
-
-    /**
-     * Возвращает список всех приоритетов
-     */
+    
     @Override
     public List<Priority> findAllPriorities(){
         return priorityRepository.findAll();

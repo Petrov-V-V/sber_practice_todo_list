@@ -1,13 +1,10 @@
 package ru.sber.project_todo_list.entities;
 
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,4 +30,14 @@ public class TaskDTO {
     private EStatus status;
 
     private ERepetition repetition;
+
+    public TaskDTO(Task task) {
+        this.id = task.getId();
+        this.title = task.getTitle();
+        this.description = task.getDescription();
+        this.taskDate = task.getTaskDate();
+        this.priority = task.getPriority().getName();
+        this.status = task.getStatus().getName();
+        this.repetition = task.getRepetition().getName();
+    }
 }

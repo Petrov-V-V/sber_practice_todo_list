@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Сервис отвечающий за работу с заданиями
@@ -30,29 +31,24 @@ public class TaskService implements TaskServiceInterface {
         this.categoryService = categoryService;
     }
 
-    /**
-     * Добавляет новое задание
-     */
     @Override
     public long add(Task task){
-        Task savedTask = taskRepository.save(task);
-        return savedTask.getId();
+        if (categoryService.isCategoryExistsForUser(task.getCategory().getId())){
+            Task savedTask = taskRepository.save(task);
+            return savedTask.getId();
+        } else {
+            return 0;
+        }
     }
-    
-    /**
-     * Находит задание по его идентификатору
-     */
+
     @Override
     public Optional<Task> findTaskById(long id){
         return taskRepository.findById(id);
     }
 
-    /**
-     * Обновляет информацию о задании
-     */
     @Override
     public boolean update(Task task){
-        if (taskRepository.existsById(task.getId())){
+        if (isTaskExistsForUser(task)){
             taskRepository.save(task);
             return true;
         } else {
@@ -60,12 +56,9 @@ public class TaskService implements TaskServiceInterface {
         }
     }
     
-    /**
-     * Удаляет задание по его идентификатору
-     */
     @Override
     public boolean deleteTaskById(long id){
-        if (taskRepository.existsById(id)){
+        if (isTaskExistsForUser(id)){
             taskRepository.deleteById(id);
             return true;
         } else {
@@ -73,45 +66,33 @@ public class TaskService implements TaskServiceInterface {
         }
     }
 
-    /**
-     * Возвращает список всех заданий для указанного пользователя
-     */
     @Override
-    public List<TaskDTO> findAllTasks(long userId){
-        List<CategoryDTO> categories = categoryService.findAllCategories(userId);
-        List<TaskDTO> tasks = new ArrayList<>();
-        for (CategoryDTO category : categories) {
-            tasks.addAll(findTasksByCategory(category.getId()));
-        }
-        return tasks;
+    public List<TaskDTO> findAllTasks() {
+        List<CategoryDTO> categories = categoryService.findAllCategories();
+        
+        return categories.stream()
+            .flatMap(category -> findTasksByCategory(category.getId()).stream())
+            .collect(Collectors.toList());
     }
     
-    /**
-     * Возвращает список заданий по указанной категории
-     */
     @Override
     public List<TaskDTO> findTasksByCategory(long categoryId){
-        List<Task> tasks = taskRepository.findAllByCategory_Id(categoryId);
-        List<TaskDTO> tasksDTO = new ArrayList<>();
-        for (Task task : tasks) {
-            tasksDTO.add(new TaskDTO(task.getId(), task.getTitle(), task.getDescription(), task.getTaskDate(), task.getPriority().getName(), task.getStatus().getName(), task.getRepetition().getName()));
+        List<Task> tasks = new ArrayList<>();
+        if (categoryService.isCategoryExistsForUser(categoryId)){
+            tasks = taskRepository.findAllByCategory_Id(categoryId);
         }
-        return tasksDTO;
+        return tasks.stream()
+            .map(TaskDTO::new)
+            .collect(Collectors.toList());
     }
     
-    /**
-     * Возвращает список заданий, о которых необходимо уведомлять пользователя
-     */
     @Override
-    public List<TaskDTO> findTasksByNotification(long userId){
-        List<TaskDTO> tasks = findAllTasks(userId);
-        List<TaskDTO> tasksForNotification = new ArrayList<>();
-        for (TaskDTO task : tasks) {
-            if (isNotifiable(task)){
-                tasksForNotification.add(task);
-            }
-        }
-        return tasksForNotification;
+    public List<TaskDTO> findTasksByNotification() {
+        List<TaskDTO> tasks = findAllTasks();
+
+        return tasks.stream()
+                .filter(TaskService::isNotifiable)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -125,6 +106,24 @@ public class TaskService implements TaskServiceInterface {
         long diffTime = taskDTO.getTaskDate().getHour() * 60 + taskDTO.getTaskDate().getMinute()-(nowTime.getHour()* 60 + nowTime.getMinute());
         if(isYear && isMonth && isDay && diffTime < 20 && diffTime >=0){
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Проверяет существует ли задача для пользователя
+     */
+    public boolean isTaskExistsForUser(Task task) {
+        return taskRepository.existsById(task.getId()) && categoryService.isCategoryExistsForUser(task.getCategory().getId());
+    }
+
+    /**
+     * Проверяет существует ли задача для пользователя
+     */
+    public boolean isTaskExistsForUser(long id) {
+        Optional<Task> optionalTask = findTaskById(id);
+        if (optionalTask.isPresent()) {
+            return categoryService.isCategoryExistsForUser(optionalTask.get().getCategory().getId());
         }
         return false;
     }

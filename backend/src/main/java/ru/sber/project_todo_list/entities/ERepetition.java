@@ -1,7 +1,7 @@
 package ru.sber.project_todo_list.entities;
 
 /**
- * Enumerate отвечающий за хранение возможных сроков повторения
+ * Перечисление сроков повторения задачи
  */
 public enum ERepetition {
     ONCE,

@@ -7,5 +7,8 @@ import ru.sber.project_todo_list.entities.Priority;
  * Интерфейс отвечающий за работу с приоритетами
  */
 public interface PriorityServiceInterface {
+    /**
+     * Возвращает список всех приоритетов
+     */
     List<Priority> findAllPriorities();
 }

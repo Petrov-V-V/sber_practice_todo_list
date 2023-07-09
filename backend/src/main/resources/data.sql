@@ -1,7 +1,6 @@
 INSERT INTO todo_list_petrov_vv.roles (id, name)
 VALUES
-    (1, 'ROLE_USER'),
-    (2, 'ROLE_ADMIN');
+    (1, 'ROLE_USER');
 INSERT INTO todo_list_petrov_vv.statuses (id, name)
 VALUES
     (1, 'IN_PROGRESS'),

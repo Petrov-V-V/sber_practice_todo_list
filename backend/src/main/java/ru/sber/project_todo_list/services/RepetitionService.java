@@ -23,10 +23,7 @@ public class RepetitionService implements RepetitionServiceInterface {
     public RepetitionService(RepetitionRepository repetitionRepository) {
         this.repetitionRepository = repetitionRepository;
     }
-
-    /**
-     * Возвращает список всех сроков повторения
-     */
+    
     @Override
     public List<Repetition> findAllRepetitions(){
         return repetitionRepository.findAll();

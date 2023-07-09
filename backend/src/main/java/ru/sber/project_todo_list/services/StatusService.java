@@ -24,9 +24,6 @@ public class StatusService implements StatusServiceInterface{
         this.statusRepository = statusRepository;
     }
 
-    /**
-     * Возвращает список всех статусов
-     */
     @Override
     public List<Status> findAllStatuses(){
         return statusRepository.findAll();

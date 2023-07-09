@@ -41,10 +41,10 @@ public class CategoryController {
      * Получает список категорий для указанного пользователя
      */
     @GetMapping
-    public List<CategoryDTO> getCategories(@RequestParam long userId) {
-        log.info("Поиск категорий пользователя {}", userId);
+    public List<CategoryDTO> getCategories() {
+        log.info("Поиск категорий пользователя");
 
-        return categoryService.findAllCategories(userId);
+        return categoryService.findAllCategories();
     }
 
     /**
@@ -53,18 +53,26 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<?> addCategory(@RequestBody Category category) {
         log.info("Добавление категории {}", category);
+        long id = categoryService.add(category);
 
-        return ResponseEntity.created(URI.create("/tasks/"+categoryService.add(category))).build();
+        if (id != 0){
+            return ResponseEntity.created(URI.create("/tasks/"+id)).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**
      * Обновляет информацию о категории
      */
     @PutMapping
-    public Category updateCategory(@RequestBody Category category) {
+    public ResponseEntity<?> updateCategory(@RequestBody Category category) {
         log.info("Обновление категории");
-        categoryService.update(category);
-        return category;
+        if (categoryService.update(category)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

@@ -1,6 +1,7 @@
 package ru.sber.project_todo_list.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.sber.project_todo_list.entities.Category;
 import ru.sber.project_todo_list.entities.Priority;
 import ru.sber.project_todo_list.entities.Repetition;
 import ru.sber.project_todo_list.entities.Status;
@@ -51,10 +52,10 @@ public class TaskController {
      * Получает список заданий для указанного пользователя
      */
     @GetMapping
-    public List<TaskDTO> getTasks(@RequestParam long userId) {
-        log.info("Поиск заданий пользователя {}", userId);
+    public List<TaskDTO> getTasks() {
+        log.info("Поиск заданий пользователя");
 
-        return taskService.findAllTasks(userId);
+        return taskService.findAllTasks();
     }
 
     /**
@@ -70,9 +71,9 @@ public class TaskController {
      * Получает список заданий, о которых необходимо уведомлять пользователя
      */
     @GetMapping("/notifications")
-    public List<TaskDTO> getTasksByNotification(@RequestParam long userId) {
+    public List<TaskDTO> getTasksByNotification() {
         log.info("Поиск задач о которых нужно уведомлять");
-        return taskService.findTasksByNotification(userId);
+        return taskService.findTasksByNotification();
     }
 
     /**
@@ -89,10 +90,13 @@ public class TaskController {
      * Обновляет информацию о задании
      */
     @PutMapping
-    public Task updateTask(@RequestBody Task task) {
+    public ResponseEntity<?> updateTask(@RequestBody Task task) {
         log.info("Обновление задания");
-        taskService.update(task);
-        return task;
+        if (taskService.update(task)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     /**

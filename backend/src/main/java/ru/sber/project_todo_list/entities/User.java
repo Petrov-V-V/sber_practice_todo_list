@@ -39,13 +39,13 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"), schema = "todo_list_petrov_vv")
     private Set<Role> roles = new HashSet<>();
 
-    // @OneToMany
-    // @JoinColumn(name = "user_id", nullable = false  )
-    // private List<Category> categories;
-
     public User(String username, String email, String password) {
       this.username = username;
       this.email = email;
       this.password = password;
+    }
+
+    public User(long id) {
+      this.id = id;
     }
 }

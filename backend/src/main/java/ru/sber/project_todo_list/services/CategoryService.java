@@ -1,16 +1,19 @@
 package ru.sber.project_todo_list.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import ru.sber.project_todo_list.entities.Category;
 import ru.sber.project_todo_list.entities.CategoryDTO;
-import ru.sber.project_todo_list.entities.Task;
+import ru.sber.project_todo_list.entities.User;
 import ru.sber.project_todo_list.repositories.CategoryRepository;
+import ru.sber.project_todo_list.security.services.UserDetailsImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Сервис отвечающий за работу с категориями
@@ -27,21 +30,17 @@ public class CategoryService  implements CategoryServiceInterface {
         this.categoryRepository = categoryRepository;
     }
     
-    /**
-     * Добавляет новую категорию
-     */
     @Override
     public long add(Category category){
+        category.setUser(new User(getUserIdOutOfSecurityContext()));
         Category savedCategory = categoryRepository.save(category);
         return savedCategory.getId();
     }
     
-    /**
-     * Обновляет информацию о категории
-     */
     @Override
     public boolean update(Category category){
-        if (categoryRepository.existsById(category.getId())){
+        if (isCategoryExistsForUser(category.getId())){
+            category.setUser(new User(getUserIdOutOfSecurityContext()));
             categoryRepository.save(category);
             return true;
         } else {
@@ -49,12 +48,9 @@ public class CategoryService  implements CategoryServiceInterface {
         }
     }
 
-    /**
-     * Удаляет категорию по ее идентификатору
-     */
     @Override
     public boolean deleteCategoryById(long id){
-        if (categoryRepository.existsById(id)){
+        if (isCategoryExistsForUser(id)){
             categoryRepository.deleteById(id);
             return true;
         } else {
@@ -62,24 +58,40 @@ public class CategoryService  implements CategoryServiceInterface {
         }
     }
     
-    /**
-     * Находит категорию по ее идентификатору
-     */
     @Override
-    public Optional<Category> findCategoryById(long id){
-        return categoryRepository.findById(id);
+    public Optional<Category> findCategoryById(){
+        long userId = getUserIdOutOfSecurityContext();
+        return categoryRepository.findById(userId);
     }
     
-    /**
-     * Возвращает список всех категорий для указанного пользователя
-     */
     @Override
-    public List<CategoryDTO> findAllCategories(long userId){
+    public List<CategoryDTO> findAllCategories() {
+        long userId = getUserIdOutOfSecurityContext();
         List<Category> categories = categoryRepository.findAllByUser_Id(userId);
-        List<CategoryDTO> categoriesDTO = new ArrayList<>();
-        for (Category category : categories) {
-            categoriesDTO.add(new CategoryDTO(category.getId(), category.getName(), category.getUser().getId()));
-        }
-        return categoriesDTO;
+        return categories.stream()
+            .map(category -> new CategoryDTO(category))
+            .collect(Collectors.toList());
     }
+
+    /**
+     * Возвращает идентификатор пользователя из контекста безопасности
+     */
+    private long getUserIdOutOfSecurityContext() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof UserDetailsImpl) {
+            return ((UserDetailsImpl)principal).getId();
+        } else {
+            throw new RuntimeException("Пользователь не найден");
+        }
+    }
+
+    /**
+     * Проверяет существует ли категория для пользователя
+     */
+    public boolean isCategoryExistsForUser(long id) {
+        long userId = getUserIdOutOfSecurityContext();
+        return categoryRepository.existsByIdAndUser_Id(id, userId);
+    }
+
 }

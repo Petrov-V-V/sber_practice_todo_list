@@ -12,11 +12,38 @@ import java.util.Optional;
  * Интерфейс отвечающий за работу с заданиями
  */
 public interface TaskServiceInterface {
+    /**
+     * Добавляет новое задание
+     */
     long add(Task task);
+    
+    /**
+     * Находит задание по его идентификатору
+     */
     Optional<Task> findTaskById(long id);
-    List<TaskDTO> findAllTasks(long userId);
-    List<TaskDTO> findTasksByCategory(long categoryId);
-    List<TaskDTO> findTasksByNotification(long userId);
+
+    /**
+     * Обновляет информацию о задании
+     */
     boolean update(Task task);
+
+    /**
+     * Удаляет задание по его идентификатору
+     */
     boolean deleteTaskById(long id);
+
+    /**
+     * Возвращает список всех заданий для указанного пользователя
+     */
+    List<TaskDTO> findAllTasks();
+
+    /**
+     * Возвращает список заданий по указанной категории
+     */
+    List<TaskDTO> findTasksByCategory(long categoryId);
+
+    /**
+     * Возвращает список заданий, о которых необходимо уведомлять пользователя
+     */
+    List<TaskDTO> findTasksByNotification();
 }
