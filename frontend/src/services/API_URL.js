@@ -1,0 +1,1 @@
+export const API_URL_STARTER = "http://localhost:8080/";

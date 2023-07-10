@@ -38,7 +38,6 @@ build/
 .DS_Store
 
 
-frontend/
 dependency-reduced-pom.xml
 
 backend/.mvn/wrapper/maven-wrapper.properties
