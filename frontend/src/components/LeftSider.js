@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Menu, Layout, message, Modal, Input } from 'antd';
 import {
@@ -30,9 +30,7 @@ const LeftSider = () => {
   const [registerEmail, setRegisterEmail] = useState('');
   const [registerUsername, setRegisterUsername] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
-  
-  const [clickCount, setClickCount] = useState(1);
-  const clickTimeoutRef = useRef(null);
+
 
   const handleAddUser = () => {
     const newUser = {
@@ -79,64 +77,6 @@ const LeftSider = () => {
     });
   };
 
-  // const handleMenuClick = () => {
-  //     setClickCount((prevCount) => prevCount + 1);
-  //     handleMenuItemClick()
-  // };
-
-  // const handleMenuItemClick = () => {
-  //   if (clickCount === 4) {
-  //     message.info('You clicked 5 times');
-  //   setClickCount(0);
-  //   }
-  // };
-
-  const handleMenuClick = () => {
-    if (clickCount === 0) {
-      clickTimeoutRef.current = setTimeout(() => {
-        setClickCount(0);
-      }, 2000);
-    }
-
-    setClickCount((prevCount) => {
-      clearTimeout(clickTimeoutRef.current);
-
-      if (prevCount === 100) {
-        message.error('Не удалось загрузить пасхалку');
-        return 0;
-      }
-
-      if (prevCount === 10 ) {
-        message.loading('Инициирована загрузка пасхалки, '+ clickCount + "%");
-      }
-
-      if (prevCount >= 20 && prevCount % 5 === 0 ) {
-        message.loading('Пасхалка загружается, '+ clickCount + "%");
-      }
-
-      clickTimeoutRef.current = setTimeout(() => {
-        setClickCount(0);
-      }, 2000);
-
-      return prevCount + 1;
-    });
-  };
-
-  // setClickCount((prevCount) => {
-  //   clearTimeout(clickTimeoutRef.current);
-
-  //   if (prevCount === 4) {
-  //     message.info('You clicked 5 times on theMostCurrentUser.username!');
-  //     return 0;
-  //   }
-
-  //   clickTimeoutRef.current = setTimeout(() => {
-  //     //setClickCount(0);
-  //   }, 2000);
-
-  //   return prevCount + 1;
-  // });
-
 
     return (
     <Sider width={200} theme='light' style={{ position: 'fixed', zIndex: 1, overflowY: 'auto'}} >
@@ -146,7 +86,7 @@ const LeftSider = () => {
           style={{ height: 'calc(100vh - 64px)', borderRight: 0, fontWeight: 'bold' }}
         >
           {theMostCurrentUser !== null && (
-            <Menu.Item key="1" icon={<UserOutlined />} onClick={handleMenuClick}>
+            <Menu.Item key="1" icon={<UserOutlined />}>
               {theMostCurrentUser.username}
             </Menu.Item>
             )}
