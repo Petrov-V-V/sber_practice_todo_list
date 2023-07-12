@@ -7,6 +7,7 @@ import {  searchTasks  } from '../slices/taskSlice';
 const { Header } = Layout;
 
 const HeaderBar = () => {
+  const [rotatePage, setRotatePage] = useState(false);
   const [clickCount, setClickCount] = useState(1);
   const clickTimeoutRef = useRef(null);
   const dispatch = useDispatch();
@@ -26,7 +27,8 @@ const HeaderBar = () => {
       clearTimeout(clickTimeoutRef.current);
 
       if (prevCount === 100) {
-        message.error('Не удалось загрузить пасхалку');
+        message.success('Что-то произошло');
+        setRotatePage(!rotatePage);
         return 0;
       }
 
@@ -52,7 +54,7 @@ const HeaderBar = () => {
 
   return (
     <Header style={{ backgroundColor: '#181A18', color: "#fff", position: 'fixed', zIndex: 2,  width: '100%',  display: 'flex',  }}>
-      <img src={LogoImage} alt="Daily Do Logo" style={{ height: 64, marginRight: 32, cursor: 'pointer' }} onClick={handleEasterEgg} />
+      <img src={LogoImage} alt="Daily Do Logo" style={{ height: 64, marginRight: 32, cursor: 'pointer', transform: rotatePage ? 'rotate(180deg)' : 'none' }} onClick={handleEasterEgg} />
       {theMostCurrentUser !== null && (
       <Input.Search
             placeholder="Поиск заданий"

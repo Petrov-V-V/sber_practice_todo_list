@@ -1,6 +1,6 @@
 import './App.css';
 import {Layout} from "antd";
-import React from "react";
+import React, { useState } from 'react';
 import {Route, Routes} from "react-router-dom";
 import {MainPage} from "./pages/MainPage";
 import {NotFoundPage} from "./pages/NotFoundPage";

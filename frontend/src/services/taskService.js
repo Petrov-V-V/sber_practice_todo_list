@@ -126,7 +126,7 @@ const updateTask = (dispatch, task, index) => {
 const deleteTask = (dispatch, task) => {
     return axios.delete(`${API_URL}/${task.id}`,  {headers: authHeader()}).then(
         (response) => {
-            getTasksByCategory(dispatch, task.category.id);
+            getTasksByCategory(dispatch, task.categoryDTO.id);
         },
         (error) => {
             const _content = (error.response && error.response.data) ||

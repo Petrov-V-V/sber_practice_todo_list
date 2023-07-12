@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Layout, Card, Checkbox, Button, Input, Select, Form , DatePicker} from 'antd';
+import { Layout, Card, Checkbox, Button, Input, Select, Form , DatePicker, message} from 'antd';
 import '../App.css';
 import {
   EditOutlined,
@@ -44,6 +44,7 @@ const TaskList = () => {
     repetition: '',
     priority: '',
   });
+
 
   useEffect(() => {
     setSelectedTasks([]);
@@ -135,7 +136,6 @@ const [newTask, setNewTask] = useState({
   title: '',
   description: '',
   taskDate: null,
-  status: '',
   repetition: '',
   priority: '',
   category: '',
@@ -147,9 +147,8 @@ const handleAddTask = () => {
     title: '',
     description: '',
     taskDate: null,
-    status: '',
-    repetition: '',
-    priority: '',
+    repetition: 'ONCE',
+    priority: 'MEDIUM',
     category: '',
 });
   setEditingTask(-1);
@@ -164,9 +163,9 @@ const handleSaveNewTask = () => {
     title: newTask.title,
     description: newTask.description,
     taskDate: newTask.taskDate,
-    status:  
-        statuses.filter(status => status.name === newTask.status)[0]
-      ,
+    status:  {
+        id: 1
+    },
       repetition:  
         repetitions.filter(repetition => repetition.name === newTask.repetition)[0]
     ,
@@ -178,7 +177,18 @@ const handleSaveNewTask = () => {
     },
   }
   taskService.addTask(dispatch, newTaskToPost);
-  setEditingTask(-1);
+  setEditingTask(-2);
+};
+
+const handleDeleteSelected = () => {
+  const tasksToDelete = selectedTasks.map((index) => sortedTasks[index]);
+  setSelectedTasks([]);
+
+  tasksToDelete.forEach((task) => {
+    taskService.deleteTask(dispatch, task);
+  });
+  setSelectedTasks([]);
+  message.success('Выделенные задания удалены');
 };
 
   return (
@@ -190,9 +200,18 @@ const handleSaveNewTask = () => {
               categories.find(category => category.id === theMostCurrentCategory)?.name
             )}
             {theMostCurrentCategory !== '' && editingTask !== -1 && (
-          <Button type="primary" style={{ backgroundColor: '#181A18' }} onClick={handleAddTask}>Добавить задание</Button>
-        )}
-      </h1>
+              <>
+              {selectedTasks.length > 0 && (
+                <Button type="primary" style={{ backgroundColor: '#C71F1F' }} onClick={handleDeleteSelected}>
+                  Удалить выделенные
+                </Button>
+              )}
+                <Button type="primary" style={{ backgroundColor: '#181A18' }} onClick={handleAddTask}>
+                  Добавить задание
+                </Button>
+              </>
+            )}
+          </h1>
         )}
       </div>
 
@@ -203,7 +222,7 @@ const handleSaveNewTask = () => {
         >
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Title</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Название</label>
               <Input
                 style={{ marginLeft: '4px' }}
                 value={newTask.title}
@@ -211,7 +230,7 @@ const handleSaveNewTask = () => {
               />
             </div>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Description</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Описание</label>
               <Input.TextArea
                 style={{ marginLeft: '4px' }}
                 value={newTask.description}
@@ -219,7 +238,7 @@ const handleSaveNewTask = () => {
               />
             </div>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Task Date</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Дата</label>
               <DatePicker
                 format={dateFormat}
                 disabledDate={disabledDate}
@@ -228,21 +247,7 @@ const handleSaveNewTask = () => {
               />
             </div>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Status</label>
-              <Select
-                style={{ width: '165px' }}
-                value={newTask.status}
-                onChange={(value) => setNewTask({ ...newTask, status: value })}
-              >
-                {statuses.map((status) => (
-                  <option key={status.name} value={status.name}>
-                    {status.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Repetition</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Повторение</label>
               <Select
                 style={{ width: '165px' }}
                 value={newTask.repetition}
@@ -256,7 +261,7 @@ const handleSaveNewTask = () => {
               </Select>
             </div>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Priority</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Приоритет</label>
               <Select
                 style={{ width: '165px' }}
                 value={newTask.priority}
@@ -269,20 +274,34 @@ const handleSaveNewTask = () => {
                 ))}
               </Select>
             </div>
+            <div  style={{ marginTop: '8px', marginBottom: '8px' }}></div>
+            <Button
+              style={{
+                position: 'absolute',
+                bottom: 8,
+                left: '40%',
+                transform: 'translateX(-50%)',
+                borderColor: 'black'
+              }}
+              onClick={() => setEditingTask(-2)}
+            >
+              Отмена
+            </Button>
             <Button
               type="primary"
               style={{
                 position: 'absolute',
                 bottom: 8,
-                left: '50%',
+                left: '60%',
                 transform: 'translateX(-50%)',
                 backgroundColor: 'black',
-                borderColor: 'black',
+                borderColor: 'black'
               }}
               onClick={handleSaveNewTask}
             >
               Сохранить
             </Button>
+            
           </div>
         </Card>
       )}
@@ -312,7 +331,7 @@ const handleSaveNewTask = () => {
           {editingTask === index ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Title</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Название</label>
               <Input
                 style={{ marginLeft: '4px' }}
                 value={editedTask.title}
@@ -320,7 +339,7 @@ const handleSaveNewTask = () => {
               />
             </div>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Description</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Описание</label>
               <Input.TextArea
                 style={{ marginLeft: '4px' }}
                 value={editedTask.description}
@@ -328,7 +347,7 @@ const handleSaveNewTask = () => {
               />
             </div>
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Task Date</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Дата</label>
               {editedTask.taskDate ? (
                 <DatePicker
                   format={dateFormat}
@@ -348,7 +367,7 @@ const handleSaveNewTask = () => {
             </div>
               
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Status</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Статус</label>
               <Select
                 style={{ width: '165px' }}
                 value={editedTask.status}
@@ -363,7 +382,7 @@ const handleSaveNewTask = () => {
             </div>
 
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Repetition</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Повторение</label>
               <Select
                 style={{ width: '165px' }}
                 value={editedTask.repetition}
@@ -378,7 +397,7 @@ const handleSaveNewTask = () => {
             </div>
 
             <div style={{ display: 'flex', marginBottom: '8px' }}>
-              <label style={{ width: '100px', marginRight: '8px' }}>Priority</label>
+              <label style={{ width: '100px', marginRight: '8px' }}>Приоритет</label>
               <Select
                 style={{ width: '165px' }}
                 value={editedTask.priority}
@@ -391,12 +410,25 @@ const handleSaveNewTask = () => {
                 ))}
               </Select>
             </div>
+            <div  style={{ marginTop: '8px', marginBottom: '8px' }}></div>
+            <Button
+              style={{
+                position: 'absolute',
+                bottom: 8,
+                left: '40%',
+                transform: 'translateX(-50%)',
+                borderColor: 'black',
+              }}
+              onClick={() => setEditingTask(-2)}
+            >
+              Отмена
+            </Button>
               <Button
                 type="primary"
                 style={{
                   position: 'absolute',
                   bottom: 8,
-                  left: '50%',
+                  left: '60%',
                   transform: 'translateX(-50%)',
                   backgroundColor: 'black',
                   borderColor: 'black',
