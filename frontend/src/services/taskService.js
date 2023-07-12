@@ -104,10 +104,15 @@ export const addTask = (dispatch, task) => {
         });
 };
 
-const updateTask = (dispatch, task) => {
+const updateTask = (dispatch, task, index) => {
     return axios.put(`${API_URL}`, task,  {headers: authHeader()}).then(
         (response) => {
-            getTasksByCategory(dispatch, task.category.id);
+            console.log(index)
+            if (index === ''){
+                getTasks(dispatch);
+            } else {
+                getTasksByCategory(dispatch, task.category.id);
+            }
         },
         (error) => {
             const _content = (error.response && error.response.data) ||

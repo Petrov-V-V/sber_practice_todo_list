@@ -2,6 +2,7 @@ import axios from "axios";
 import { setCategories } from "../slices/categorySlice";
 import authHeader from "./authHeader";
 import { API_URL_STARTER } from "./API_URL";
+import { message } from "antd";
 
 const API_URL = API_URL_STARTER + "categories";
 
@@ -27,9 +28,10 @@ export const getCategories = (dispatch) => {
 export const addCategory = (dispatch, category) => {
     return axios.post(`${API_URL}`, category,  {headers: authHeader()}).then(
         (response) => {
-            setCategories(dispatch);
+            getCategories(dispatch);
         },
         (error) => {
+            message.error('Введено неподходящее имя');
             const _content = (error.response && error.response.data) ||
                 error.message ||
                 error.toString();
@@ -41,9 +43,10 @@ export const addCategory = (dispatch, category) => {
 const updateCategory = (dispatch, category) => {
     return axios.put(`${API_URL}`, category, {headers: authHeader()}).then(
         (response) => {
-            setCategories(dispatch);
+            getCategories(dispatch);
         },
         (error) => {
+            message.error('Введено неподходящее имя');
             const _content = (error.response && error.response.data) ||
                 error.message ||
                 error.toString();
@@ -58,6 +61,7 @@ const deleteCategory = (dispatch, category) => {
             getCategories(dispatch);
         },
         (error) => {
+            message.error('Категория не является пустой');
             const _content = (error.response && error.response.data) ||
                 error.message ||
                 error.toString();

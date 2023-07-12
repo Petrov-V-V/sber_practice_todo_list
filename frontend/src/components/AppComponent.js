@@ -15,12 +15,14 @@ const AppComponent = () => {
   const dispatch = useDispatch();
   const theMostCurrentUser = useSelector((state) => state.auth.user);
 
-  //const tasks = useSelector((state) => state.task.tasks);
-  //const categories = useSelector((state) => state.category.categories);
-
   useEffect(() => {
-    categoryService.getCategories(dispatch);
-    taskService.getTasks(dispatch);
+    if (theMostCurrentUser !== null){
+      categoryService.getCategories(dispatch);
+      taskService.getTasks(dispatch);
+      taskService.getStatuses(dispatch);
+      taskService.getRepetitions(dispatch);
+      taskService.getPriorities(dispatch);
+    }
   }, []);
 
   return (

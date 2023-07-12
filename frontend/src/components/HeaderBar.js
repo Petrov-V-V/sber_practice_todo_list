@@ -1,14 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Row, Col, Input, Button, Layout, Card, AutoComplete, Modal, Select, message, Menu } from 'antd';
 import LogoImage from "../img/LogoImageNew.png"
-
-
+import {  searchTasks  } from '../slices/taskSlice';
 
 const { Header } = Layout;
 
 const HeaderBar = () => {
   const [clickCount, setClickCount] = useState(1);
   const clickTimeoutRef = useRef(null);
+  const dispatch = useDispatch();
+  
+  const theMostCurrentUser = useSelector((state) => state.auth.user);
+  const theMostCurrentCategory = useSelector((state) => state.category.currentCategory);
+  const searchQuery = useSelector((state) => state.task.searchQuery);
 
   const handleEasterEgg = () => {
     if (clickCount === 0) {
@@ -40,17 +45,23 @@ const HeaderBar = () => {
       return prevCount + 1;
     });
   };
+  
+  const handleSearchQueryChange = (e) => {
+    dispatch(searchTasks(e.target.value));
+  };
 
   return (
     <Header style={{ backgroundColor: '#181A18', color: "#fff", position: 'fixed', zIndex: 2,  width: '100%',  display: 'flex',  }}>
       <img src={LogoImage} alt="Daily Do Logo" style={{ height: 64, marginRight: 32, cursor: 'pointer' }} onClick={handleEasterEgg} />
+      {theMostCurrentUser !== null && (
       <Input.Search
             placeholder="Поиск заданий"
-            // value={searchQuery}
-            // onSelect={handleSearchQueryChange}
-            // onChange={handleSearchQueryChange}
+            value={searchQuery}
+            onSelect={handleSearchQueryChange}
+            onChange={handleSearchQueryChange}
             style={{ width: 290, marginTop: 16, marginLeft: 16 }}
           />
+          )}
     </Header>
       
   );

@@ -30,7 +30,6 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("tasks")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class TaskController {
     private TaskService taskService;
     private RepetitionService repetitionService;
@@ -82,8 +81,14 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<?> addTask(@RequestBody Task task) {
         log.info("Добавление задания {}", task);
+        long id = taskService.add(task);
 
-        return ResponseEntity.created(URI.create("/tasks/"+taskService.add(task))).build();
+        if (id != 0){
+            return ResponseEntity.created(URI.create("/tasks/"+id)).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     /**

@@ -25,7 +25,6 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("categories")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class CategoryController {
     private CategoryService categoryService;
 
@@ -56,7 +55,7 @@ public class CategoryController {
         long id = categoryService.add(category);
 
         if (id != 0){
-            return ResponseEntity.created(URI.create("/tasks/"+id)).build();
+            return ResponseEntity.created(URI.create("/categories/"+id)).build();
         } else {
             return ResponseEntity.badRequest().build();
         }

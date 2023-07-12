@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import ru.sber.project_todo_list.entities.Category;
 import ru.sber.project_todo_list.entities.CategoryDTO;
+import ru.sber.project_todo_list.entities.Task;
 import ru.sber.project_todo_list.entities.User;
 import ru.sber.project_todo_list.repositories.CategoryRepository;
 import ru.sber.project_todo_list.security.services.UserDetailsImpl;
@@ -33,13 +34,17 @@ public class CategoryService  implements CategoryServiceInterface {
     @Override
     public long add(Category category){
         category.setUser(new User(getUserIdOutOfSecurityContext()));
-        Category savedCategory = categoryRepository.save(category);
-        return savedCategory.getId();
+        if (isCategoryNameSuitabe(category)){
+            Category savedCategory = categoryRepository.save(category);
+            return savedCategory.getId();
+        } else {
+            return 0;
+        }
     }
     
     @Override
     public boolean update(Category category){
-        if (isCategoryExistsForUser(category.getId())){
+        if (isCategoryExistsForUser(category.getId()) && isCategoryNameSuitabe(category)){
             category.setUser(new User(getUserIdOutOfSecurityContext()));
             categoryRepository.save(category);
             return true;
@@ -92,6 +97,17 @@ public class CategoryService  implements CategoryServiceInterface {
     public boolean isCategoryExistsForUser(long id) {
         long userId = getUserIdOutOfSecurityContext();
         return categoryRepository.existsByIdAndUser_Id(id, userId);
+    }
+
+    /**
+     * Проверяет подходящее ли имя задано для категории
+     */
+    private boolean isCategoryNameSuitabe(Category category) {
+        if (category.getName().equals("Архив") || category.getName().equals("Корзина")){
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

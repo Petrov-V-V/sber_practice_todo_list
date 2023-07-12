@@ -12,7 +12,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4O
 
 ###
 GET http://localhost:8080/tasks
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4OTE1Nzk2LCJleHAiOjE2ODkwMDIxOTZ9.-6Y2lbjfZHb3BemBopE_9OLPloljcyV1H8E_JbVnTr0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDg3MDE2LCJleHAiOjE2ODkxNzM0MTZ9.M_Yj2jUwQ0TPhwiB7b5xAPEAg8UgZQTNcPj-9yLYtZo
 
 ###
 GET http://localhost:8080/tasks/categories?categoryId=9 
@@ -24,7 +24,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4O
 
 ###
 POST http://localhost:8080/tasks
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbW9uZ3VzIiwiaWF0IjoxNjg4ODk5MDU4LCJleHAiOjE2ODg5ODU0NTh9.F1do8kXivZ8URgxNOuic9zJKRixsGcxbyPAchGXGZf4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZXJnZWkiLCJpYXQiOjE2ODkwMjkwMjcsImV4cCI6MTY4OTExNTQyN30.8VjNgZEVI4ewO7s4fl8TWY3w13Hf0oB6lIKD_E9FT4Y
 Content-Type: application/json
 
 {
@@ -35,7 +35,7 @@ Content-Type: application/json
         "id": 1 
     },
     "category": {
-        "id": 9
+        "id": 58
     },
     "repetition": {
         "id": 1 
@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ###
 PUT http://localhost:8080/tasks
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDEyMTUwLCJleHAiOjE2ODkwOTg1NTB9.QuJ17FHGc8oMtsUXUzqgyYG_DDXVqtNZ8GWbPVpc0K8
 Content-Type: application/json
 
 {

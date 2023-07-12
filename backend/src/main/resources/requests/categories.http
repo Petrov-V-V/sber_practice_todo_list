@@ -1,10 +1,10 @@
 ###
 GET http://localhost:8080/categories
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbW9uZ3VzIiwiaWF0IjoxNjg4ODk5MDU4LCJleHAiOjE2ODg5ODU0NTh9.F1do8kXivZ8URgxNOuic9zJKRixsGcxbyPAchGXGZf4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDEyMTUwLCJleHAiOjE2ODkwOTg1NTB9.QuJ17FHGc8oMtsUXUzqgyYG_DDXVqtNZ8GWbPVpc0K8
 
 ###
 POST http://localhost:8080/categories
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbW9uZ3VzIiwiaWF0IjoxNjg4ODk5MDU4LCJleHAiOjE2ODg5ODU0NTh9.F1do8kXivZ8URgxNOuic9zJKRixsGcxbyPAchGXGZf4
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDE1NTk1LCJleHAiOjE2ODkxMDE5OTV9.PGN0tXnb1VhOiB3ltCMqehPIwy9riqOLqCq6Qz5E70E
 Content-Type: application/json
 
 {
