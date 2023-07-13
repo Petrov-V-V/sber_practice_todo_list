@@ -4,6 +4,8 @@ import { Layout, Card, Checkbox, Button, Input, Select, Form , DatePicker, messa
 import '../App.css';
 import {
   EditOutlined,
+  DownOutlined,
+  UpOutlined,
 } from '@ant-design/icons';
 import taskService from '../services/taskService';
 import dayjs from 'dayjs';
@@ -107,14 +109,16 @@ const TaskList = () => {
   };
 
   const handleCardClick = (index) => {
-    setExpandedTasks((prevExpandedTasks) => {
-      if (prevExpandedTasks.includes(index)) {
-        return prevExpandedTasks.filter((taskIndex) => taskIndex !== index);
-      } else {
-        return [...prevExpandedTasks, index];
-      }
-    });
-  }
+    if (sortedTasks[index].description) {
+      setExpandedTasks((prevExpandedTasks) => {
+        if (prevExpandedTasks.includes(index)) {
+          return prevExpandedTasks.filter((taskIndex) => taskIndex !== index);
+        } else {
+          return [...prevExpandedTasks, index];
+        }
+      });
+    }
+  };
 
   const handleCheckboxChange = (event, index) => {
     event.stopPropagation();
@@ -520,7 +524,7 @@ const handleDeselectAll = () => {
           <Card
             key={index}
             style={{
-              cursor: editingTask === index ? 'default' : 'pointer',
+              cursor: editingTask === index || !task.description ? 'default' : 'pointer',
               marginBottom: 16,
               backgroundColor: selectedTasks.includes(index) ? selectedColor : backgroundColor,
             }}
@@ -669,7 +673,7 @@ const handleDeselectAll = () => {
                 )}
                 <p style={{ marginLeft: 16, marginTop: -16, marginBottom: 0, fontSize: 12 }}>
                 {task.repetition && task.taskDate ? (
-                  <span style={{ color: task.status === 'IN_PROGRESS' && task.repetition === 'ONCE' && dayjs(task.taskDate, dateFormat) < dayjs().endOf('day') ? 'red' : 'gray' }}>
+                  <span style={{ color: task.status === 'IN_PROGRESS' && task.repetition === 'ONCE' && dayjs(task.taskDate, dateFormat) < dayjs() ? 'red' : 'gray' }}>
                     {task.taskDate}
                     {task.repetition === 'DAILY' && ' и через день'}
                     {task.repetition === 'EVERY_OTHER_DAY' && ' и через 2 дня'}
@@ -697,6 +701,11 @@ const handleDeselectAll = () => {
                 handleEditTask(index);
                 e.stopPropagation();
               }} icon={<EditOutlined />} />
+              {task.description && (
+                <div className="expand-icon" style={{ position: "absolute", marginTop: task.description && task.taskDate ? 60 : 52, right: "50%" }}>
+                  {expandedTasks.includes(index) ? <UpOutlined /> : <DownOutlined />}
+                </div>
+              )}
             </div>
           )}
 
