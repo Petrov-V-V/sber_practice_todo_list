@@ -34,11 +34,11 @@ const HeaderBar =  ( {handleRotatePage} ) => {
         return 0;
       }
 
-      if (prevCount === 5 ) {
+      if (prevCount === 10 ) {
         message.loading('Инициирована загрузка пасхалки, '+ clickCount * 2 + "%");
       }
 
-      if (prevCount >= 10 && prevCount % 5 === 0 ) {
+      if (prevCount >= 15 && prevCount % 5 === 0 ) {
         message.loading('Пасхалка загружается, '+ clickCount * 2 + "%");
       }
 
