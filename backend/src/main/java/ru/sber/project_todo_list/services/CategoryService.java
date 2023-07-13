@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import ru.sber.project_todo_list.entities.Category;
 import ru.sber.project_todo_list.entities.CategoryDTO;
 import ru.sber.project_todo_list.entities.Task;
+import ru.sber.project_todo_list.entities.TaskDTO;
 import ru.sber.project_todo_list.entities.User;
 import ru.sber.project_todo_list.repositories.CategoryRepository;
+import ru.sber.project_todo_list.repositories.TaskRepository;
 import ru.sber.project_todo_list.security.services.UserDetailsImpl;
 
 import java.util.ArrayList;
@@ -22,13 +24,16 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService  implements CategoryServiceInterface {
     private final CategoryRepository categoryRepository;
+    private final TaskRepository taskRepository;
 
     /**
      * Конструктор сервиса категорий
      */
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, 
+                            TaskRepository taskRepository) {
         this.categoryRepository = categoryRepository;
+        this.taskRepository = taskRepository;
     }
     
     @Override
@@ -78,6 +83,11 @@ public class CategoryService  implements CategoryServiceInterface {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean isCategoryEmpty(long id) {
+        return isCategoryExistsForUser(id) && taskRepository.countByCategory_Id(id) == 0;
+    }
+
     /**
      * Возвращает идентификатор пользователя из контекста безопасности
      */
@@ -103,7 +113,7 @@ public class CategoryService  implements CategoryServiceInterface {
      * Проверяет подходящее ли имя задано для категории
      */
     private boolean isCategoryNameSuitabe(Category category) {
-        if (category.getName().equals("Архив") || category.getName().equals("Корзина")){
+        if (category.getName().equals("Архив")){
             return false;
         } else {
             return true;

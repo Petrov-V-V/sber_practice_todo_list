@@ -46,4 +46,9 @@ public interface TaskServiceInterface {
      * Возвращает список заданий, о которых необходимо уведомлять пользователя
      */
     List<TaskDTO> findTasksByNotification();
+    
+    /**
+     * Возвращает список заданий которые нужно выполнить сегодня
+     */
+    List<TaskDTO> findTasksToday();
 }

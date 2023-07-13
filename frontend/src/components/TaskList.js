@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Layout, Card, Checkbox, Button, Input, Select, Form , DatePicker, message} from 'antd';
+import { Layout, Card, Checkbox, Button, Input, Select, Form , DatePicker, message, Empty, Row, Tag, Modal } from 'antd';
 import '../App.css';
 import {
   EditOutlined,
@@ -15,7 +15,8 @@ const { Content } = Layout;
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 const disabledDate = (current) => {
-  return current && current < dayjs().endOf('day');
+  const yesterday = dayjs().subtract(1, 'day').endOf('day');
+  return current && current < yesterday;
 };
 
 const TaskList = () => {
@@ -26,13 +27,49 @@ const TaskList = () => {
   const repetitions = useSelector((state) => state.task.repetitions);
   const priorities = useSelector((state) => state.task.priorities);
 
-  const sortedTasks = tasks.filter(task => (true)).sort((a, b) => a.id - b.id);
+  const sortType = useSelector((state) => state.task.sortType);
+  const sortedTasks = tasks
+    .filter((task) => true)
+    .sort((a, b) => {
+      if (sortType === 2) {
+        const priorityOrder = {
+          CRITICAL: 0,
+          URGENT: 1,
+          HIGH: 2,
+          MEDIUM: 3,
+          LOW: 4,
+        };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      } else if (sortType === 3) {
+        if (a.taskDate === null && b.taskDate === null) {
+          return 0;
+        } else if (a.taskDate === null) {
+          return 1;
+        } else if (b.taskDate === null) {
+          return -1;
+        } else {
+          return new Date(a.taskDate) - new Date(b.taskDate);
+        }
+      } else if (sortType === 4) {
+        const statusOrder = {
+          IN_PROGRESS: 0,
+          COMPLETED: 1,
+          ON_HOLD: 2,
+        };
+        return statusOrder[a.status] - statusOrder[b.status];
+      }  else {
+        return a.id - b.id;
+      }
+    });
+
 
   const categories = useSelector((state) => state.category.categories);
   const theMostCurrentUser = useSelector((state) => state.auth.user);
   const theMostCurrentCategory = useSelector((state) => state.category.currentCategory);
+  const categoryFromTheOutside = useSelector((state) => state.category.categoryNotFromList);
 
   const [selectedTasks, setSelectedTasks] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(-2);
   const [editedTask, setEditedTask] = useState({
@@ -50,7 +87,24 @@ const TaskList = () => {
     setSelectedTasks([]);
     setExpandedTasks([]);
     setEditingTask(null);
-  }, [theMostCurrentCategory]);
+  }, [theMostCurrentCategory, sortType]);
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'CRITICAL':
+        return 'magenta';
+      case 'URGENT':
+        return 'volcano';
+      case 'HIGH':
+        return 'orange';
+      case 'MEDIUM':
+        return 'blue';
+      case 'LOW':
+        return 'cyan';
+      default:
+        return undefined;
+    }
+  };
 
   const handleCardClick = (index) => {
     setExpandedTasks((prevExpandedTasks) => {
@@ -111,24 +165,16 @@ const TaskList = () => {
     ,
     }
     console.log(theMostCurrentCategory);
-    taskService.updateTask(dispatch, newTaskToUpdate, theMostCurrentCategory);
+    taskService.updateTask(dispatch, newTaskToUpdate, theMostCurrentCategory, categoryFromTheOutside);
     setEditingTask(-2);
   };
 
-  const [selectedDate, setSelectedDate] = useState();
   const handleDateChange = (date) => {
     if (date){
-      setEditedTask({
-        id: editedTask.id,
-        title: editedTask.title,
-        description: editedTask.description,
-        taskDate: date.format("YYYY-MM-DD HH:mm:ss"),
-        status: editedTask.status,
-        repetition: editedTask.repetition,
-        priority: editedTask.priority,
-        category: editedTask.category,
-      });
-    } 
+      setEditedTask({ ...editedTask, taskDate: date.format("YYYY-MM-DD HH:mm:ss") });
+    } else {
+      setEditedTask({ ...editedTask, taskDate: null });
+    }
 };
 
 const [newTask, setNewTask] = useState({
@@ -155,7 +201,11 @@ const handleAddTask = () => {
 };
 
 const handleNewDateChange = (date) => {
-  setNewTask({ ...newTask, taskDate: date.format("YYYY-MM-DD HH:mm:ss") });
+  if (date){
+    setNewTask({ ...newTask, taskDate: date.format("YYYY-MM-DD HH:mm:ss") });
+  } else {
+    setNewTask({ ...newTask, taskDate: null });
+  }
 };
 
 const handleSaveNewTask = () => {
@@ -181,41 +231,181 @@ const handleSaveNewTask = () => {
 };
 
 const handleDeleteSelected = () => {
-  const tasksToDelete = selectedTasks.map((index) => sortedTasks[index]);
-  setSelectedTasks([]);
+  if (selectedTasks.length > 0) {
+    Modal.confirm({
+      title: 'Подтверждение удаления',
+      content: 'Вы уверены, что хотите удалить выбранные задания?',
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk: () => {
+      selectedTasks.forEach((index) => {
+        const task = sortedTasks[index];
+        taskService.deleteTask(dispatch, task, theMostCurrentCategory, categoryFromTheOutside);
+      });
+      setSelectedTasks([]);
+      message.success('Выделенные задания удалены');
+      },
+    });
+  }
+};
 
-  tasksToDelete.forEach((task) => {
-    taskService.deleteTask(dispatch, task);
+const handleMoveSelectedToArchive = () => {
+  selectedTasks.forEach((index) => {
+    const task = sortedTasks[index];
+    const updatedTask = {
+      ...task,
+      category: categories.find((category) => category.name === 'Архив'),
+      status: statuses.filter((status) => status.name === task.status)[0],
+      repetition: repetitions.filter((repetition) => repetition.name === task.repetition)[0],
+      priority: priorities.filter((priority) => priority.name === task.priority)[0],
+    };
+    taskService.updateTask(dispatch, updatedTask, theMostCurrentCategory, categoryFromTheOutside);
   });
   setSelectedTasks([]);
-  message.success('Выделенные задания удалены');
 };
+
+const handleMarkSelectedAsCompleted = () => {
+  selectedTasks.forEach((index) => {
+    const task = sortedTasks[index];
+    const updatedTask = { ...task, status: {
+      id: 3
+    } ,
+    repetition:  
+      repetitions.filter(repetition => repetition.name === task.repetition)[0]
+    ,
+    priority:  
+      priorities.filter(priority => priority.name === task.priority)[0]
+    ,
+    category: task.categoryDTO,
+  };
+    taskService.updateTask(dispatch, updatedTask, theMostCurrentCategory, categoryFromTheOutside);
+  });
+  setSelectedTasks([]);
+};
+
+const handleMarkSelectedAsOnHold = () => {
+  selectedTasks.forEach((index) => {
+    const task = sortedTasks[index];
+    const updatedTask = { ...task, status: {
+      id: 2
+    },
+    repetition:  
+      repetitions.filter(repetition => repetition.name === task.repetition)[0]
+    ,
+    priority:  
+      priorities.filter(priority => priority.name === task.priority)[0]
+    ,
+    category: task.categoryDTO,
+  };
+    taskService.updateTask(dispatch, updatedTask, theMostCurrentCategory, categoryFromTheOutside);
+  });
+  setSelectedTasks([]);
+};
+
+const handleMoveSelected = (categoryId) => {
+  selectedTasks.forEach((index) => {
+    const task = sortedTasks[index];
+    const updatedTask = {
+      ...task,
+      category: categories.find((category) => category.id === categoryId),
+      status: statuses.filter((status) => status.name === task.status)[0],
+      repetition: repetitions.filter((repetition) => repetition.name === task.repetition)[0],
+      priority: priorities.filter((priority) => priority.name === task.priority)[0],
+    };
+    taskService.updateTask(dispatch, updatedTask, theMostCurrentCategory, categoryFromTheOutside);
+  });
+  setSelectedTasks([]);
+};
+
+const handleSelectAll = () => {
+  if (selectedTasks.length === 0) {
+    setSelectedTasks(sortedTasks.map((_, index) => index));
+    setSelectAll(true);
+  }
+};
+
+const handleDeselectAll = () => {
+  setSelectedTasks([]);
+  setSelectAll(false);
+};
+
 
   return (
     <Content style={{ marginLeft: 220, padding: '0 16px' }}>
       <div>
-        {theMostCurrentUser !== null && (
-          <h1 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {theMostCurrentCategory !== '' && (
-              categories.find(category => category.id === theMostCurrentCategory)?.name
-            )}
-            {theMostCurrentCategory !== '' && editingTask !== -1 && (
-              <>
+        {theMostCurrentUser !== null ? (
+          <Row style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h1 style={{ marginBottom: 16, marginTop: 16}}>
+            {theMostCurrentCategory !== '' ? (
+              categories.find(category => category.id === theMostCurrentCategory)?.name.trim() !== ''
+                ? categories.find(category => category.id === theMostCurrentCategory)?.name
+                : '\u2001'
+            ) : ('\u2001')}
+            </h1>
+            
+            <Row>
               {selectedTasks.length > 0 && (
-                <Button type="primary" style={{ backgroundColor: '#C71F1F' }} onClick={handleDeleteSelected}>
-                  Удалить выделенные
+                <>
+                  <Button danger style={{ borderColor: "#015738", color: '#015738', backgroundColor: '#FFF', marginRight: 8, marginBottom: 12, marginTop: 12  }} onClick={handleMarkSelectedAsCompleted}>
+                    Выполнить
+                  </Button>
+                  <Button danger style={{  borderColor: "#8B8000", color: '#8B8000', backgroundColor: '#FFF', marginRight: 8, marginBottom: 12, marginTop: 12  }} onClick={handleMarkSelectedAsOnHold}>
+                    Отложить
+                  </Button>
+                  <Button danger type="primary" style={{ borderColor: "#C71F1F", color: '#C71F1F', backgroundColor: '#FFF', marginRight: 8, marginBottom: 12, marginTop: 12  }} onClick={handleDeleteSelected}>
+                    Удалить
+                  </Button>
+                  <div>
+                      <Select
+                        defaultValue="Перенести в"
+                        style={{ marginRight: 8, marginBottom: 12, marginTop: 12  }}
+                        onChange={(categoryId) => handleMoveSelected(categoryId)}
+                      >
+                        {categories
+                          .filter((category) => category.id !== theMostCurrentCategory)
+                          .filter((category) => category.name !== 'Архив')
+                          .map((category) => (
+                            <Option key={category.id} value={category.id}>
+                              {category.name !== '' ? (category.name) : ('\u2001')}
+                            </Option>
+                          ))}
+                      </Select>
+                    </div>
+                  {theMostCurrentCategory !== categories.find((category) => category.name === 'Архив').id && (
+                    <Button type="primary" style={{ backgroundColor: '#181A18', marginRight: 8, marginBottom: 12, marginTop: 12  }} onClick={handleMoveSelectedToArchive}>
+                      Перенести в архив
+                    </Button>  
+                  )}
+                  </>
+              )}
+              {selectedTasks.length > 0 && (
+                <Button
+                  type="primary"
+                  style={{ width: 140, backgroundColor: '#181A18', marginRight: 8, marginBottom: 12, marginTop: 12  }}
+                  onClick={handleDeselectAll}
+                >
+                  Снять выделение
                 </Button>
               )}
-                <Button type="primary" style={{ backgroundColor: '#181A18' }} onClick={handleAddTask}>
-                  Добавить задание
+              {selectedTasks.length === 0 && sortedTasks.length !== 0 && (
+                <Button type="primary" style={{ width: 140, backgroundColor: '#181A18', marginRight: 8, marginBottom: 12, marginTop: 12 }} onClick={handleSelectAll}>
+                  Выделить всё
                 </Button>
-              </>
-            )}
-          </h1>
-        )}
+              )}
+              {theMostCurrentCategory !== '' && editingTask !== -1 && (
+                <Button type="primary" style={{ backgroundColor: '#181A18', marginBottom: 12, marginTop: 12  }} onClick={handleAddTask}>
+                  Новое задание
+                </Button>
+              )}
+            </Row>
+            
+          </Row>
+        ) : (
+          <h1>{'\u2001'}</h1>
+          )}
       </div>
 
-      
       {editingTask === -1 && (
         <Card
           style={{ marginBottom: 16 }}
@@ -306,15 +496,23 @@ const handleDeleteSelected = () => {
         </Card>
       )}
 
+      {sortedTasks.length === 0 && (
+        <div style={{ textAlign: 'center' }}>
+          <Empty
+            description={<span>Здесь пусто</span>}
+          />
+        </div>
+      )}
+
       {sortedTasks.map((task, index) => {
         let backgroundColor = 'white';
         let selectedColor = '#f0f0f0';
 
         if (task.status === 'ON_HOLD') {
-          backgroundColor = 'lightcoral';
-          selectedColor = '#D8B0B0';
+          backgroundColor = '#FFF9A6';
+          selectedColor = '#e8e5b7';
         } else if (task.status === 'COMPLETED') {
-          backgroundColor = 'lightgreen';
+          backgroundColor = '#abedab';
           selectedColor = '#C2DCC1';
         }
 
@@ -455,18 +653,45 @@ const handleDeleteSelected = () => {
               />
               <div style={{ flex: 1 }}>
                 {task.taskDate ? (
-                  <h3 style={{ marginLeft: 16 }}>{task.title}</h3>
+                  <h3 style={{ marginLeft: 16 }}>
+                    {task.title}
+                    <Tag style={{ marginLeft: 8 }} color={getPriorityColor(task.priority)}>
+                      {task.priority}
+                    </Tag>
+                  </h3>
                 ) : (
-                  <h3 style={{ marginLeft: 16, marginTop: 0 }}>{task.title}</h3>
+                  <h3 style={{ marginLeft: 16, marginTop: 0 }}>
+                    {task.title}
+                    <Tag style={{ marginLeft: 8 }} color={getPriorityColor(task.priority)}>
+                      {task.priority}
+                    </Tag>
+                  </h3>
                 )}
-                <p style={{ marginLeft: 16, marginTop: -16, marginBottom: 0, fontSize: 12, color: 'gray' }}>
-                {task.repetition === 'ONCE' && task.taskDate ? `До ${task.taskDate}` : task.taskDate ? `С ${task.taskDate}` : null}
+                <p style={{ marginLeft: 16, marginTop: -16, marginBottom: 0, fontSize: 12 }}>
+                {task.repetition && task.taskDate ? (
+                  <span style={{ color: task.status === 'IN_PROGRESS' && task.repetition === 'ONCE' && dayjs(task.taskDate, dateFormat) < dayjs().endOf('day') ? 'red' : 'gray' }}>
+                    {task.taskDate}
+                    {task.repetition === 'DAILY' && ' и через день'}
+                    {task.repetition === 'EVERY_OTHER_DAY' && ' и через 2 дня'}
+                    {task.repetition === 'WEEKLY' && ' и через неделю'}
+                    {task.repetition === 'BIWEEKLY' && ' и через 2 недели'}
+                    {task.repetition === 'MONTHLY' && ' и через месяц'}
+                    {task.repetition === 'QUARTERLY ' && ' и через 3 месяца'}
+                  </span> 
+                ) : null}
+
               </p>
             </div>
             {theMostCurrentCategory === '' && (
-              <p style={{ marginRight: 16, marginTop: 'auto', textAlign: 'right' }}>
-                {task.categoryDTO.name}
-              </p>
+              task.taskDate ? (
+                <p style={{ marginRight: 16, marginTop: 'auto', textAlign: 'right' }}>
+                  {task.categoryDTO.name}
+                </p>
+              ) : (
+                <p style={{ marginRight: 16, textAlign: 'right' }}>
+                  {task.categoryDTO.name}
+                </p>
+              )
             )}
               <Button onClick={(e) => {
                 handleEditTask(index);

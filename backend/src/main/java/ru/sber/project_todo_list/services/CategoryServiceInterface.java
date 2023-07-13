@@ -3,6 +3,7 @@ package ru.sber.project_todo_list.services;
 
 import ru.sber.project_todo_list.entities.Category;
 import ru.sber.project_todo_list.entities.CategoryDTO;
+import ru.sber.project_todo_list.entities.TaskDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +32,8 @@ public interface CategoryServiceInterface {
      * Возвращает список всех категорий для указанного пользователя
      */
     List<CategoryDTO> findAllCategories();
+    /**
+     * Проверяет является ли категория пустой для указанного пользователя
+     */
+    boolean isCategoryEmpty(long id);
 }

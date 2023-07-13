@@ -8,6 +8,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.sber.project_todo_list.services.StatusService;
+import ru.sber.project_todo_list.services.RepetitionService;
+import ru.sber.project_todo_list.services.PriorityService;
+
+import org.springframework.stereotype.Repository;
 
 /**
  * Класс отвечающий за хранение урезанной информации о заданиях

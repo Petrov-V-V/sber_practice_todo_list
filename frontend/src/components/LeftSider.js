@@ -19,7 +19,6 @@ import { login, logout } from "../slices/authSlice";
 import taskService from '../services/taskService';
 import { setTasks } from '../slices/taskSlice';
 import categoryService from '../services/categoryService';
-import { setCurrentCategory } from '../slices/categorySlice';
 
 
 const { Sider } = Layout;
@@ -28,6 +27,8 @@ const { SubMenu } = Menu;
 const LeftSider = () => {
   const categories = useSelector((state) => state.category.categories);
   const theMostCurrentUser = useSelector((state) => state.auth.user);
+  const theMostCurrentCategory = useSelector((state) => state.category.currentCategory);
+  const categoryNotFromList = useSelector((state) => state.category.categoryNotFromList);
 
   const dispatch = useDispatch();
 
@@ -82,20 +83,30 @@ const LeftSider = () => {
   };
 
   const handleLogout = () => {
-    authService.logout().then(() => {
-      dispatch(logout());
-      dispatch(setTasks([]));
+    Modal.confirm({
+      title: 'Вы уверены, что хотите выйти?',
+      okText: 'Выйти',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk: () => {
+        authService.logout().then(() => {
+          dispatch(logout());
+          dispatch(setTasks([]));
+        });
+      },
     });
+    
   };
   
 
-  const getTasksForUser = (id) => {
+  const getTasksForUser = () => {
     taskService.getTasks(dispatch);
-    dispatch(setCurrentCategory(''));
   };
   const getTasksFromCategory = (id) => {
     taskService.getTasksByCategory(dispatch, id);
-    dispatch(setCurrentCategory(id));
+  };
+  const getTodaysTasks = () => {
+    taskService.getTodaysTasks(dispatch);
   };
   const sortedCategories = categories
     .filter(category => category.name !== 'Архив')
@@ -136,12 +147,47 @@ const LeftSider = () => {
     setNewCategoryName('');
   };
 
+  const [openDeleteWindow, setOpenDeleteWindow] = useState({
+    open: false,
+    categoryId: null
+  });
+
   const handleCategoryDelete = (categoryId) => {
-    const newCategory = {
-      id: categoryId
-    };
-    categoryService.deleteCategory(dispatch, newCategory);
+    
     setEditingCategory(null);
+    categoryService.isCategoryEmpty(dispatch, categoryId).then((isCategoryForDeleteEmpty) => {
+      if (isCategoryForDeleteEmpty) {
+        const newCategory = {
+          id: categoryId
+        };
+        categoryService.deleteCategory(dispatch, newCategory, theMostCurrentCategory);
+      } else {
+        setOpenDeleteWindow({ open: true, categoryId: categoryId });
+      }
+    });
+    
+  };
+
+  const handleDeleteTasks = () => {
+    const newCategory = {
+      id: openDeleteWindow.categoryId
+    };
+    console.log(newCategory);
+    categoryService.deleteCategoryAndTasks(dispatch, newCategory, theMostCurrentCategory, categoryNotFromList);
+    setOpenDeleteWindow({ open: false, categoryId: null });
+  };
+
+  const handleArchiveTasks = () => {
+    const newCategory = {
+      id: openDeleteWindow.categoryId
+    };
+    categoryService.deleteCategoryAndArchiveTasks(
+      dispatch, 
+      newCategory, 
+      theMostCurrentCategory, 
+      categories.find((category) => category.name === 'Архив'),
+      categoryNotFromList);
+    setOpenDeleteWindow({ open: false, categoryId: null });
   };
 
     return (
@@ -162,7 +208,7 @@ const LeftSider = () => {
             </Menu.Item>
             )}
             {theMostCurrentUser !== null && (
-            <Menu.Item key="3" icon={<CalendarOutlined />}>
+            <Menu.Item key="3" icon={<CalendarOutlined />} onClick={() => getTodaysTasks()}>
               Сегодня
             </Menu.Item>
             )}
@@ -244,7 +290,7 @@ const LeftSider = () => {
                             e.stopPropagation();
                           }}
                           className="delete-button"
-                          style={{ position: 'absolute', right: '0rem', top: '50%', transform: 'translateY(-50%)' }}
+                          style={{ position: 'absolute', right: '0rem', top: '50%', transform: 'translateY(-50%)', color: 'red' }}
                         />
                       </div>
                       ) : (
@@ -301,6 +347,8 @@ const LeftSider = () => {
       <Modal
         title="Регистрация"
         visible={addUserModalVisible}
+        okText={'Вступить'}
+        cancelText={'Отмена'}
         onOk={handleAddUser}
         onCancel={() => setAddUserModalVisible(false)}
       >
@@ -326,6 +374,8 @@ const LeftSider = () => {
       <Modal
         title="Вход"
         visible={switchUserModalVisible}
+        okText={'Войти'}
+        cancelText={'Отмена'}
         onOk={handleClickLogIn}
         onCancel={() => setSwitchUserModalVisible(false)}
       >
@@ -341,6 +391,26 @@ const LeftSider = () => {
           value={logInPassword}
           onChange={(e) => setLogInPassword(e.target.value)}
         />
+      </Modal>
+      <Modal
+        open={openDeleteWindow.open}
+        title="Категория не является пустой!"
+        onCancel={() => setOpenDeleteWindow({ open: false, categoryId: null })}
+        footer={[
+          <Button key="cancel" onClick={() => {
+            setOpenDeleteWindow({ open: false, categoryId: null });
+            }}>
+            Отмена
+          </Button>,
+          <Button type="primary" key="archiveTasks" style={{ backgroundColor: '#181A18'}} onClick={handleArchiveTasks}>
+            Архивировать задания
+          </Button>,
+          <Button danger key="deleteTasks" onClick={handleDeleteTasks}>
+            Удалить задания
+          </Button>,
+        ]}
+      >
+       <p>Выберите что произойдёт с заданиями внутри категории:</p>
       </Modal>
       </Sider>
         );

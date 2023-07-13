@@ -9,6 +9,7 @@ export const taskSlice = createSlice({
     priorities: [],
     filteredTasks: [],
     searchQuery: '',
+    sortType: 1,
   },
   reducers: {
     setTasks: (state, action) => {
@@ -31,6 +32,9 @@ export const taskSlice = createSlice({
       task.title.toLowerCase().includes(state.searchQuery.toLowerCase())
       );
     },
+    setSortType: (state, action) => {
+      state.sortType = action.payload;
+    },
   }
 });
 
@@ -40,6 +44,7 @@ export const {
   setRepetitions,
   setPriorities,
   searchTasks,
+  setSortType,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

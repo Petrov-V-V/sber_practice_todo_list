@@ -1,7 +1,8 @@
 import axios from "axios";
 import { setTasks, setStatuses, setRepetitions, setPriorities } from "../slices/taskSlice";
+import { setCurrentCategory, setCategoryNotFromList } from '../slices/categorySlice';
 import authHeader from "./authHeader";
-import { message } from "antd";
+import { notification } from "antd";
 import { API_URL_STARTER } from "./API_URL";
 
 const API_URL = API_URL_STARTER + "tasks";
@@ -52,6 +53,8 @@ export const getTasks = (dispatch) => {
     return axios.get(`${API_URL}`,  {headers: authHeader()}).then(
         (response) => {
             dispatch(setTasks(response.data));
+            dispatch(setCurrentCategory(''));
+            dispatch(setCategoryNotFromList(1));
         },
         (error) => {
             const _content = (error.response && error.response.data) ||
@@ -66,6 +69,7 @@ export const getTasksByCategory = (dispatch, id) => {
     return axios.get(`${API_URL}/categories?categoryId=${id}`,  {headers: authHeader()}).then(
         (response) => {
             dispatch(setTasks(response.data));
+            dispatch(setCurrentCategory(id));
         },
         (error) => {
             const _content = (error.response && error.response.data) ||
@@ -75,11 +79,32 @@ export const getTasksByCategory = (dispatch, id) => {
             dispatch(setTasks([]));
         });
 };
-
-export const getTasksWithNotifications = (dispatch) => {
+export const getTasksWithNotifications = () => {
     return axios.get(`${API_URL}/notifications`,  {headers: authHeader()}).then(
         (response) => {
+            if(response.data){
+                response.data.forEach(task=> notification.info({
+                    message: task.categoryDTO.name,
+                    description: `Задание "${task.title}" дожна быть выполнена до ${task.taskDate}`,
+            }));
+            }
+        },
+        (error) => {
+            const _content = (error.response && error.response.data) ||
+                error.message ||
+                error.toString();
+            console.error(_content)
+        });
+};
+
+setInterval(getTasksWithNotifications, 60000 );
+
+export const getTodaysTasks = (dispatch) => {
+    return axios.get(`${API_URL}/today`,  {headers: authHeader()}).then(
+        (response) => {
             dispatch(setTasks(response.data));
+            dispatch(setCurrentCategory(''));
+            dispatch(setCategoryNotFromList(2));
         },
         (error) => {
             const _content = (error.response && error.response.data) ||
@@ -104,14 +129,18 @@ export const addTask = (dispatch, task) => {
         });
 };
 
-const updateTask = (dispatch, task, index) => {
+const updateTask = (dispatch, task, index, indexFromOutside) => {
+    console.log(task);
     return axios.put(`${API_URL}`, task,  {headers: authHeader()}).then(
         (response) => {
-            console.log(index)
             if (index === ''){
-                getTasks(dispatch);
+                if (indexFromOutside === 1) {
+                    getTasks(dispatch);
+                } else if (indexFromOutside === 2) {
+                    getTodaysTasks(dispatch);
+                }
             } else {
-                getTasksByCategory(dispatch, task.category.id);
+                getTasksByCategory(dispatch, index);
             }
         },
         (error) => {
@@ -123,10 +152,18 @@ const updateTask = (dispatch, task, index) => {
         });
 };
 
-const deleteTask = (dispatch, task) => {
+const deleteTask = (dispatch, task, index, indexFromOutside) => {
     return axios.delete(`${API_URL}/${task.id}`,  {headers: authHeader()}).then(
         (response) => {
-            getTasksByCategory(dispatch, task.categoryDTO.id);
+            if (index === ''){
+                if (indexFromOutside === 1) {
+                    getTasks(dispatch);
+                } else if (indexFromOutside === 2) {
+                    getTodaysTasks(dispatch);
+                }
+            } else {
+                getTasksByCategory(dispatch, task.categoryDTO.id);
+            }
         },
         (error) => {
             const _content = (error.response && error.response.data) ||
@@ -144,9 +181,10 @@ const taskService = {
     getTasks, 
     getTasksByCategory, 
     getTasksWithNotifications, 
+    getTodaysTasks,
     addTask,
     updateTask,
-    deleteTask
+    deleteTask,
 };
 
 

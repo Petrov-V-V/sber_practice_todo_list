@@ -76,6 +76,16 @@ public class TaskController {
     }
 
     /**
+     * Получает список заданий сегодня
+     */
+    @GetMapping("/today")
+    public List<TaskDTO> getTasksToday() {
+        log.info("Поиск задач сегодня");
+        return taskService.findTasksToday();
+    }
+
+
+    /**
      * Добавляет новое задание
      */
     @PostMapping

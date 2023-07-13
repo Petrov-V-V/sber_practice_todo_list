@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ru.sber.project_todo_list.entities.EStatus;
 import ru.sber.project_todo_list.entities.Status;
 import ru.sber.project_todo_list.repositories.StatusRepository;
 
@@ -27,5 +28,10 @@ public class StatusService implements StatusServiceInterface{
     @Override
     public List<Status> findAllStatuses(){
         return statusRepository.findAll();
+    }
+
+    @Override
+    public Status findByName(EStatus name){
+        return statusRepository.findByName(name).get();
     }
 }

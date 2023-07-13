@@ -1,8 +1,11 @@
 package ru.sber.project_todo_list.repositories;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import ru.sber.project_todo_list.entities.ERepetition;
 import ru.sber.project_todo_list.entities.Repetition;
 
 /**
@@ -10,4 +13,5 @@ import ru.sber.project_todo_list.entities.Repetition;
  */
 @Repository
 public interface RepetitionRepository extends JpaRepository<Repetition, Long> {
+    Optional<Repetition> findByName(ERepetition  name);
 }

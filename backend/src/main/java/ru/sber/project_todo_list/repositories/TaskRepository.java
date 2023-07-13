@@ -15,4 +15,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAllByCategory_Id(long categoryId);
+    long countByCategory_Id(long categoryId);
 }

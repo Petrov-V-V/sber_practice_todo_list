@@ -1,8 +1,10 @@
 import axios from "axios";
-import { setCategories } from "../slices/categorySlice";
+import { setCategories, setCurrentCategory, setCategoryNotFromList, setIsCategoryForDeleteEmpty } from "../slices/categorySlice";
+import { setTasks, searchTasks } from "../slices/taskSlice";
 import authHeader from "./authHeader";
 import { API_URL_STARTER } from "./API_URL";
 import { message } from "antd";
+import taskService from '../services/taskService';
 
 const API_URL = API_URL_STARTER + "categories";
 
@@ -22,6 +24,20 @@ export const getCategories = (dispatch) => {
                 error.toString();
             console.error(_content)
             dispatch(setCategories([]));
+        });
+};
+
+const isCategoryEmpty = (dispatch, id) => {
+    return axios.get(`${API_URL}/${id}`, {headers: authHeader()}).then(
+        (response) => {
+            return response.data;
+        },
+        (error) => {
+            const _content = (error.response && error.response.data) ||
+                error.message ||
+                error.toString();
+
+            console.error(_content)
         });
 };
 
@@ -55,10 +71,15 @@ const updateCategory = (dispatch, category) => {
         });
 };
 
-const deleteCategory = (dispatch, category) => {
+const deleteCategory = (dispatch, category, index) => {
     return axios.delete(`${API_URL}/${category.id}`, {headers: authHeader()}).then(
         (response) => {
             getCategories(dispatch);
+            if (index === category.id){
+                dispatch(setCurrentCategory(''));
+                dispatch(setCategoryNotFromList(0));
+            }
+            message.success("Категория удалена");
         },
         (error) => {
             message.error('Категория не является пустой');
@@ -70,11 +91,66 @@ const deleteCategory = (dispatch, category) => {
         });
 };
 
+const deleteCategoryAndTasks = (dispatch, category, index, categoryNotFromList) => {
+    return axios.delete(`${API_URL}/with-tasks/${category.id}`, {headers: authHeader()}).then(
+        (response) => {
+            getCategories(dispatch);
+            if (index === category.id){
+                dispatch(setCurrentCategory(''));
+                dispatch(setCategoryNotFromList(0));
+                dispatch(setTasks([]));
+            } else if (index == '' && categoryNotFromList === 1) {
+                taskService.getTasks(dispatch);
+            } else if (index == '' && categoryNotFromList === 2) {
+                taskService.getTodaysTasks(dispatch);
+            }
+            message.success("Категория и содержимое удалены");
+        },
+        (error) => {
+            const _content = (error.response && error.response.data) ||
+                error.message ||
+                error.toString();
+
+            console.error(_content)
+            message.error('Произошла неизвестная ошибка');
+        });
+};
+
+const deleteCategoryAndArchiveTasks = (dispatch, category, index, categoryArchive, categoryNotFromList) => {
+    return axios.delete(`${API_URL}/${category.id}/archiving-tasks/${categoryArchive.id}`, {headers: authHeader()}).then(
+        (response) => {
+            getCategories(dispatch);
+            if (index === category.id){
+                dispatch(setCurrentCategory(''));
+                dispatch(setCategoryNotFromList(0));
+                dispatch(setTasks([]));
+            } else if (index === categoryArchive.id){
+                taskService.getTasksByCategory(dispatch, categoryArchive.id);
+            } else if (index == '' && categoryNotFromList === 1) {
+                taskService.getTasks(dispatch);
+            } else if (index == '' && categoryNotFromList === 2) {
+                taskService.getTodaysTasks(dispatch);
+            }
+            message.success("Категория удалена, содержимое перенесено в архив");
+        },
+        (error) => {
+            const _content = (error.response && error.response.data) ||
+                error.message ||
+                error.toString();
+
+            console.error(_content)
+            message.error('Произошла неизвестная ошибка');
+        });
+};
+
 const categoryService = {
     getCategories,
+    isCategoryEmpty,
     addCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    deleteCategoryAndTasks,
+    deleteCategoryAndArchiveTasks,
 };
 
 

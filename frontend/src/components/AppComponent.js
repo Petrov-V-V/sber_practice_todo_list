@@ -4,12 +4,11 @@ import { Layout, Menu, Space, Input, Modal, message, Card, Checkbox  } from 'ant
 import '../App.css';
 import categoryService from '../services/categoryService';
 import taskService from '../services/taskService';
+import { setCurrentCategory, setCategoryNotFromList } from '../slices/categorySlice';
 
 import LeftSider from "../components/LeftSider";
 import TaskList from "../components/TaskList";
 
-
-const { Sider, Header, Footer, Content } = Layout;
 
 const AppComponent = () => {
   const dispatch = useDispatch();
@@ -22,8 +21,11 @@ const AppComponent = () => {
       taskService.getStatuses(dispatch);
       taskService.getRepetitions(dispatch);
       taskService.getPriorities(dispatch);
+      dispatch(setCurrentCategory(''));
+      dispatch(setCategoryNotFromList(1));
+
     }
-  }, []);
+  }, [theMostCurrentUser]);
 
   return (
       <Layout style={{ marginTop: 64}} >

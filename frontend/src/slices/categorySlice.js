@@ -5,6 +5,7 @@ export const categorySlice = createSlice({
   initialState: {
     categories: [],
     currentCategory: '',
+    categoryNotFromList: 0,
   },
   reducers: {
     setCategories: (state, action) => {
@@ -13,12 +14,16 @@ export const categorySlice = createSlice({
     setCurrentCategory: (state, action) => {
       state.currentCategory = action.payload;
     },
+    setCategoryNotFromList: (state, action) => {
+      state.categoryNotFromList = action.payload;
+    },
   }
 });
 
 export const {
   setCategories,
   setCurrentCategory,
+  setCategoryNotFromList,
 } = categorySlice.actions;
 
 export default categorySlice.reducer;

@@ -9,9 +9,13 @@ import HeaderBar from "./components/HeaderBar";
 
 
 function App() {
+  const [rotatePage, setRotatePage] = useState(false);
+  const handleRotatePage = () => {
+    setRotatePage(!rotatePage);
+  } 
     return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <HeaderBar />
+    <Layout style={{ minHeight: '100vh', transform: rotatePage ? 'rotate(180deg)' : 'none' }}>
+      <HeaderBar handleRotatePage={handleRotatePage}/>
       <Routes>
           <Route index element={<MainPage/>}/>
           <Route path="*" element={<NotFoundPage/>}/>
