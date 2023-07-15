@@ -1,0 +1,74 @@
+###
+GET http://localhost:8080/tasks/statuses
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+
+###
+GET http://localhost:8080/tasks/repetitions
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+
+###
+GET http://localhost:8080/tasks/priorities
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+
+###
+GET http://localhost:8080/tasks
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDg3MDE2LCJleHAiOjE2ODkxNzM0MTZ9.M_Yj2jUwQ0TPhwiB7b5xAPEAg8UgZQTNcPj-9yLYtZo
+
+###
+GET http://localhost:8080/tasks/categories?categoryId=9 
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+
+###
+GET http://localhost:8080/tasks/notifications
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+
+###
+POST http://localhost:8080/tasks
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzZXJnZWkiLCJpYXQiOjE2ODkwMjkwMjcsImV4cCI6MTY4OTExNTQyN30.8VjNgZEVI4ewO7s4fl8TWY3w13Hf0oB6lIKD_E9FT4Y
+Content-Type: application/json
+
+{
+  "title": "Позвонить Серёге",
+  "description": "включить телефон, открыть контакты и нажать звонок",
+  "taskDate": "2023-07-08 12:12:10",
+  "status": {
+        "id": 1 
+    },
+    "category": {
+        "id": 58
+    },
+    "repetition": {
+        "id": 1 
+    },
+    "priority": {
+        "id": 1 
+    }
+}
+
+###
+PUT http://localhost:8080/tasks
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDEyMTUwLCJleHAiOjE2ODkwOTg1NTB9.QuJ17FHGc8oMtsUXUzqgyYG_DDXVqtNZ8GWbPVpc0K8
+Content-Type: application/json
+
+{
+  "id": 12,
+  "title": "Позвонить Игорю",
+  "description": "включить телефон, открыть контакты и нажать звонок",
+  "taskDate": "2023-07-08 20:35:10",
+  "status": {
+        "id": 1 
+    },
+    "category": {
+        "id": 9
+    },
+    "repetition": {
+        "id": 1 
+    },
+    "priority": {
+        "id": 1 
+    }
+}
+
+###
+DELETE http://localhost:8080/tasks/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY

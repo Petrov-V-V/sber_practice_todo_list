@@ -1,0 +1,27 @@
+###
+GET http://localhost:8080/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDEyMTUwLCJleHAiOjE2ODkwOTg1NTB9.QuJ17FHGc8oMtsUXUzqgyYG_DDXVqtNZ8GWbPVpc0K8
+
+###
+POST http://localhost:8080/categories
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg5MDE1NTk1LCJleHAiOjE2ODkxMDE5OTV9.PGN0tXnb1VhOiB3ltCMqehPIwy9riqOLqCq6Qz5E70E
+Content-Type: application/json
+
+{
+  "name": "Имя старой категории"
+}
+
+
+###
+PUT http://localhost:8080/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
+Content-Type: application/json
+
+{
+  "id": 8,
+  "name": "Новое имя старой категории"
+}
+
+###
+DELETE http://localhost:8080/categories/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlZ3VzIiwiaWF0IjoxNjg4ODk1NjQ1LCJleHAiOjE2ODg5ODIwNDV9.s2cIXE0Lv-0xqw_EVG1SXBUxKAq-g0cLCDynS1lPYEY
